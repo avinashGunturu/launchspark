@@ -1,0 +1,140 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LaunchSpark</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            'background': 'rgb(var(--color-background) / <alpha-value>)',
+            'foreground': 'rgb(var(--color-foreground) / <alpha-value>)',
+            'primary': '#00D5A3',
+            'primary-hover': '#00B88A',
+            'primary-light': 'rgba(var(--color-primary-light-rgba))',
+            'muted': 'rgb(var(--color-muted) / <alpha-value>)',
+            'muted-light': 'rgb(var(--color-muted-light) / <alpha-value>)',
+            'card': 'rgb(var(--color-card) / <alpha-value>)',
+            'border': 'rgb(var(--color-border) / <alpha-value>)',
+          },
+          fontFamily: {
+            sans: ['"Inter"', 'sans-serif'],
+          },
+          boxShadow: {
+            'sm': '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+            'md': '0 4px 6px -1px rgba(0, 0, 0, 0.06), 0 2px 4px -1px rgba(0, 0, 0, 0.05)',
+            'lg': '0 10px 15px -3px rgba(0, 0, 0, 0.06), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+            'xl': '0 20px 25px -5px rgba(0, 0, 0, 0.06), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+            'inner': 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.05)',
+            'glow-primary': '0 0 20px rgba(0, 213, 163, 0.3), 0 0 40px rgba(0, 213, 163, 0.2)',
+          },
+          animation: {
+            'fade-in-up': 'fadeInUp 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards',
+            'subtle-shine': 'subtleShine 5s infinite ease-in-out',
+            'aurora': 'aurora 20s infinite linear',
+            'reveal-word': 'revealWord 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards',
+            'pulse-glow': 'pulseGlow 2.5s infinite ease-in-out',
+          },
+          keyframes: {
+            fadeInUp: {
+              '0%': { opacity: '0', transform: 'translateY(20px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            },
+            subtleShine: {
+              '0%, 100%': { 'background-position': '0% 50%' },
+              '50%': { 'background-position': '100% 50%' },
+            },
+            aurora: {
+              from: { transform: 'rotate(0deg)' },
+              to: { transform: 'rotate(360deg)' },
+            },
+            revealWord: {
+              from: { opacity: '0', transform: 'translateY(30px) rotate(5deg)' },
+              to: { opacity: '1', transform: 'translateY(0) rotate(0deg)' },
+            },
+            pulseGlow: {
+                '0%, 100%': { 
+                    transform: 'scale(1)', 
+                    boxShadow: '0 0 20px rgba(0, 213, 163, 0.3), 0 0 40px rgba(0, 213, 163, 0.2)',
+                },
+                '50%': { 
+                    transform: 'scale(1.05)', 
+                    boxShadow: '0 0 35px rgba(0, 213, 163, 0.5), 0 0 65px rgba(0, 213, 163, 0.35)',
+                },
+            }
+          }
+        },
+      },
+    }
+  </script>
+  <style>
+    :root {
+        --color-background: 253 254 255; /* #FDFEFF */
+        --color-foreground: 13 17 23;   /* #0D1117 */
+        --color-card: 255 255 255;       /* #FFFFFF */
+        --color-muted: 85 94 104;      /* #555E68 */
+        --color-muted-light: 243 244 246; /* #F3F4F6 */
+        --color-border: 229 231 235;    /* #E5E7EB */
+        --color-grid: 229 231 235;
+        --color-primary-light-rgba: 0, 213, 163, 0.08;
+    }
+
+    html.dark {
+        --color-background: 13 17 23;   /* #0D1117 */
+        --color-foreground: 243 244 246; /* #F3F4F6 */
+        --color-card: 22 27 34;       /* #161B22 */
+        --color-muted: 136 146 176;    /* #8892b0 */
+        --color-muted-light: 48 54 61; /* #30363d */
+        --color-border: 48 54 61;       /* #30363d */
+        --color-grid: 48 54 61;
+        --color-primary-light-rgba: 0, 213, 163, 0.15;
+    }
+
+    body {
+      background-color: rgb(var(--color-background));
+      color: rgb(var(--color-foreground));
+      font-family: 'Inter', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    .main-page-fade {
+      animation: fadeIn 1s cubic-bezier(0.390, 0.575, 0.565, 1.000) forwards;
+    }
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+    .bg-grid-pattern {
+      background-image: linear-gradient(to right, rgba(var(--color-grid), 0.4) 1px, transparent 1px), linear-gradient(to bottom, rgba(var(--color-grid), 0.4) 1px, transparent 1px);
+      background-size: 2.5rem 2.5rem;
+    }
+  </style>
+<script type="importmap">
+{
+  "imports": {
+    "react-router-dom": "https://aistudiocdn.com/react-router-dom@^7.8.2",
+    "react/": "https://aistudiocdn.com/react@^19.1.1/",
+    "react": "https://aistudiocdn.com/react@^19.1.1",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.1.1/"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+<body>
+  <div id="root"></div>
+<script type="module" src="/index.tsx"></script>
+</body>
+</html>
