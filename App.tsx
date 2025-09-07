@@ -14,6 +14,7 @@ import WhatsAppIcon from './components/WhatsAppIcon';
 import LeadModal from './components/LeadModal';
 import { ThemeProvider } from './components/ThemeContext';
 import './components/PortfolioDetailModal'; // Ensure component is bundled
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 
 const ScrollToTop: React.FC = () => {
   const { pathname } = useLocation();
@@ -57,6 +58,7 @@ const App: React.FC = () => {
               <Route path="/portfolio" element={<PortfolioPage openModal={openModal} />} />
               <Route path="/testimonials" element={<TestimonialsPage openModal={openModal} />} />
               <Route path="/contact" element={<ContactPage />} />
+              <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
             </Routes>
           </main>
           <FloatingCTA />
