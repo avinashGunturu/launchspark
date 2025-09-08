@@ -1,5 +1,8 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import CTAButton from './CTAButton';
+import { useNotifications } from './NotificationContext.tsx';
+import { submitQuoteRequest } from '../utilities/api';
 
 interface LeadModalProps {
     onClose: () => void;
@@ -17,9 +20,11 @@ const initialFormState = {
 type FormState = typeof initialFormState;
 
 const LeadModal: React.FC<LeadModalProps> = ({ onClose }) => {
+    const { showSuccess, showError } = useNotifications();
     const [formState, setFormState] = useState<FormState>(initialFormState);
     const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({});
     const [isSubmitted, setIsSubmitted] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const modalRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -92,11 +97,34 @@ const LeadModal: React.FC<LeadModalProps> = ({ onClose }) => {
         return Object.keys(newErrors).length === 0;
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (validate()) {
-            console.log('Lead submitted:', formState);
-            setIsSubmitted(true);
+        if (!validate() || isLoading) return;
+
+        setIsLoading(true);
+
+        try {
+            const payload = {
+                fullName: formState.name,
+                email: formState.email,
+                mobileNumber: formState.mobile,
+                numberOfPages: formState.pages,
+                budgetRange: formState.budget,
+                projectDescription: formState.details,
+            };
+
+            const response = await submitQuoteRequest(payload);
+            
+            if (response.code === 0) {
+                setIsSubmitted(true);
+                showSuccess(response.message || 'Quote request sent!');
+            } else {
+                showError(response.message || 'Failed to send quote request.');
+            }
+        } catch (error) {
+            showError('A network error occurred. Please try again.');
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -205,7 +233,7 @@ const LeadModal: React.FC<LeadModalProps> = ({ onClose }) => {
                                     {errors.details && <p id="details-error" className="text-red-500 text-sm mt-1">{errors.details}</p>}
                                 </div>
                                 <div className="text-right pt-4">
-                                    <CTAButton type="submit">Get My Free Quote</CTAButton>
+                                    <CTAButton type="submit" disabled={isLoading}>{isLoading ? 'Submitting...' : 'Get My Free Quote'}</CTAButton>
                                 </div>
                             </form>
                         </>

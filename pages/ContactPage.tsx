@@ -1,6 +1,9 @@
+
 import React, { useState } from 'react';
 import CTAButton from '../components/CTAButton';
 import FaqAccordion from '../components/FaqAccordion';
+import { useNotifications } from '../components/NotificationContext.tsx';
+import { submitContactForm } from '../utilities/api';
 
 const ContactInfoItem: React.FC<{ icon: JSX.Element; title: string; children: React.ReactNode; href?: string }> = ({ icon, title, children, href }) => {
     const content = (
@@ -41,9 +44,11 @@ const initialFormState = { name: '', email: '', mobile: '', service: 'launchpad'
 type FormState = typeof initialFormState;
 
 const ContactPage: React.FC = () => {
+    const { showSuccess, showError } = useNotifications();
     const [formState, setFormState] = useState<FormState>(initialFormState);
     const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({});
     const [isSubmitted, setIsSubmitted] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
@@ -75,11 +80,32 @@ const ContactPage: React.FC = () => {
     };
 
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (validate()) {
-            console.log(formState);
-            setIsSubmitted(true);
+        if (!validate() || isLoading) return;
+
+        setIsLoading(true);
+
+        try {
+            const payload = {
+                fullName: formState.name,
+                email: formState.email,
+                mobileNumber: formState.mobile,
+                serviceOfInterest: formState.service,
+                projectDescription: formState.inquiry,
+            };
+            const response = await submitContactForm(payload);
+
+            if (response.code === 0) {
+                setIsSubmitted(true);
+                showSuccess(response.message || 'Your message has been sent successfully!');
+            } else {
+                showError(response.message || 'An unknown error occurred.');
+            }
+        } catch (error) {
+            showError('A network error occurred. Please try again.');
+        } finally {
+            setIsLoading(false);
         }
     };
     
@@ -152,7 +178,7 @@ const ContactPage: React.FC = () => {
                                         {errors.inquiry && <p id="inquiry-error" className="text-red-500 text-sm mt-1">{errors.inquiry}</p>}
                                     </div>
                                     <div className="text-right pt-2">
-                                        <CTAButton type="submit">Send Your Message</CTAButton>
+                                        <CTAButton type="submit" disabled={isLoading}>{isLoading ? 'Sending...' : 'Send Your Message'}</CTAButton>
                                     </div>
                                 </form>
                             </>
@@ -160,18 +186,18 @@ const ContactPage: React.FC = () => {
                     </div>
                     <div className="md:col-span-2 space-y-4">
                         <ContactInfoItem 
-                            href="mailto:launchspark.in@gmail.com"
+                            href="mailto:launchsaprk.in@gmail.com"
                             icon={<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" /></svg>}
                             title="Email Us"
                         >
-                            launchspark.in@gmail.com
+                            launchsaprk.in@gmail.com
                         </ContactInfoItem>
                          <ContactInfoItem 
-                            href="tel:+919381365400"
+                            href="tel:+1234567890"
                             icon={<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" /></svg>}
                             title="Call Us"
                         >
-                            +91 9381365400
+                            +1 (234) 567-890
                         </ContactInfoItem>
                         <div className="w-full h-48 bg-muted-light rounded-lg flex items-center justify-center text-muted border border-border">
                             [Map Embed Placeholder]

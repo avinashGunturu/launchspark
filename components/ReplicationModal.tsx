@@ -2,6 +2,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import CTAButton from './CTAButton';
 import type { PortfolioItem } from '../types';
+import { useNotifications } from './NotificationContext.tsx';
+import { submitReplicationRequest } from '../utilities/api';
 
 interface ReplicationModalProps {
     item: PortfolioItem;
@@ -18,9 +20,11 @@ const initialFormState = {
 type FormState = typeof initialFormState;
 
 const ReplicationModal: React.FC<ReplicationModalProps> = ({ item, onClose }) => {
+    const { showSuccess, showError } = useNotifications();
     const [formState, setFormState] = useState<FormState>(initialFormState);
     const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({});
     const [isSubmitted, setIsSubmitted] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const modalRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -88,11 +92,34 @@ const ReplicationModal: React.FC<ReplicationModalProps> = ({ item, onClose }) =>
         return Object.keys(newErrors).length === 0;
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (validate()) {
-            console.log('Replication Request submitted:', { ...formState, project: item.title, priceRange: item.priceRange });
-            setIsSubmitted(true);
+        if (!validate() || isLoading) return;
+
+        setIsLoading(true);
+        
+        try {
+            const payload = {
+                projectName: item.title,
+                estimatedPrice: item.priceRange,
+                fullName: formState.name,
+                email: formState.email,
+                mobileNumber: formState.mobile,
+                additionalNotes: formState.notes,
+            };
+
+            const response = await submitReplicationRequest(payload);
+            
+            if (response.code === 0) {
+                setIsSubmitted(true);
+                showSuccess(response.message || 'Replication request sent successfully!');
+            } else {
+                showError(response.message || 'Failed to send replication request.');
+            }
+        } catch (error) {
+            showError('A network error occurred. Please try again.');
+        } finally {
+            setIsLoading(false);
         }
     };
     
@@ -168,7 +195,7 @@ const ReplicationModal: React.FC<ReplicationModalProps> = ({ item, onClose }) =>
                                     <textarea id="notes" name="notes" rows={3} onChange={handleChange} value={formState.notes} className={inputClasses}></textarea>
                                 </div>
                                 <div className="text-right pt-4">
-                                    <CTAButton type="submit">Submit Request</CTAButton>
+                                    <CTAButton type="submit" disabled={isLoading}>{isLoading ? 'Submitting...' : 'Submit Request'}</CTAButton>
                                 </div>
                             </form>
                         </>

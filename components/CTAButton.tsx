@@ -10,9 +10,10 @@ interface CTAButtonProps {
   type?: 'button' | 'submit' | 'reset';
   className?: string;
   variant?: 'primary' | 'secondary';
+  disabled?: boolean;
 }
 
-const CTAButton: React.FC<CTAButtonProps> = ({ children, onClick, href, to, type = 'button', className = '', variant = 'primary' }) => {
+const CTAButton: React.FC<CTAButtonProps> = ({ children, onClick, href, to, type = 'button', className = '', variant = 'primary', disabled = false }) => {
   const baseClasses = "inline-block font-semibold py-3 px-8 rounded-full transform transition-all duration-300 ease-in-out focus:outline-none focus-visible:ring-4 tracking-wide";
   
   const variantClasses = {
@@ -20,11 +21,11 @@ const CTAButton: React.FC<CTAButtonProps> = ({ children, onClick, href, to, type
     secondary: "bg-card text-foreground border border-border shadow-md hover:bg-muted-light hover:border-primary/50 hover:-translate-y-0.5 focus-visible:ring-primary/30"
   };
 
-  const finalClasses = `${baseClasses} ${variantClasses[variant]} ${className}`;
+  const finalClasses = `${baseClasses} ${variantClasses[variant]} ${className} ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`;
 
   if (to) {
     return (
-      <Link to={to} className={finalClasses}>
+      <Link to={to} className={finalClasses} aria-disabled={disabled} onClick={(e) => disabled && e.preventDefault()}>
         {children}
       </Link>
     );
@@ -32,14 +33,14 @@ const CTAButton: React.FC<CTAButtonProps> = ({ children, onClick, href, to, type
 
   if (href) {
     return (
-      <a href={href} className={finalClasses}>
+      <a href={href} className={finalClasses} aria-disabled={disabled} onClick={(e) => disabled && e.preventDefault()}>
         {children}
       </a>
     );
   }
 
   return (
-    <button type={type} onClick={onClick} className={finalClasses}>
+    <button type={type} onClick={onClick} className={finalClasses} disabled={disabled}>
       {children}
     </button>
   );
